@@ -105,15 +105,49 @@ export function ChurnForm({ onSubmit, isLoading }: ChurnFormProps) {
     }
   }
 
+  // ✅ Función para generar datos aleatorios
+  const fillRandomData = () => {
+    setErrors({})
+    const randomValues = {
+      meses_como_cliente: Math.floor(Math.random() * 72) + 1,
+      cargo_mensual: Math.floor(Math.random() * 120) + 20,
+      adulto_mayor: Math.random() > 0.5 ? 1 : 0,
+      tiene_pareja: Math.random() > 0.5 ? "Yes" : "No",
+      dependientes: Math.random() > 0.5 ? "Yes" : "No",
+      tipo_internet: ["DSL", "Fiber optic", "None"][Math.floor(Math.random() * 3)],
+      seguridad_en_linea: ["Yes", "No", "No internet service"][Math.floor(Math.random() * 3)],
+      respaldo_en_linea: ["Yes", "No", "No internet service"][Math.floor(Math.random() * 3)],
+      proteccion_dispositivo: ["Yes", "No", "No internet service"][Math.floor(Math.random() * 3)],
+      soporte_tecnico: ["Yes", "No", "No internet service"][Math.floor(Math.random() * 3)],
+      tipo_contrato: ["Month-to-month", "One year", "Two year"][Math.floor(Math.random() * 3)],
+      facturacion_electronica: Math.random() > 0.5 ? "Yes" : "No",
+      metodo_pago: ["Electronic check", "Mailed check", "Bank transfer", "Credit card"][Math.floor(Math.random() * 4)],
+    }
+    setFormData(randomValues)
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Datos del Cliente</CardTitle>
-        <CardDescription>
+    <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm shadow-lg">
+      <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10">
+        <CardTitle className="flex items-center gap-3 text-xl">
+          <span className="text-2xl">📝</span>
+          Datos del Cliente
+        </CardTitle>
+        <CardDescription className="text-base mt-2">
           Completa todos los campos para realizar la predicción
         </CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="flex justify-end mb-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={fillRandomData}
+            className="gap-2 mt-4"
+          >
+            Llenar con Datos Aleatorios
+          </Button>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
@@ -122,7 +156,7 @@ export function ChurnForm({ onSubmit, isLoading }: ChurnFormProps) {
                 id="meses_como_cliente"
                 type="number"
                 min="0"
-                value={formData.meses_como_cliente || ""}
+                value={formData.meses_como_cliente.toString()}
                 onChange={(e) =>
                   setFormData({ ...formData, meses_como_cliente: Number(e.target.value) })
                 }
@@ -139,7 +173,7 @@ export function ChurnForm({ onSubmit, isLoading }: ChurnFormProps) {
                 type="number"
                 min="0"
                 step="0.01"
-                value={formData.cargo_mensual || ""}
+                value={formData.cargo_mensual.toString()}
                 onChange={(e) =>
                   setFormData({ ...formData, cargo_mensual: Number(e.target.value) })
                 }

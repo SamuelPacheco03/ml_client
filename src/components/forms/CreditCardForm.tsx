@@ -81,6 +81,14 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
   // Usar externalIsLoading si está disponible, sino usar el estado interno
   const currentIsLoading = externalIsLoading !== undefined ? externalIsLoading : isLoading
 
+  // ✅ Función para validar campos entre 0 y 1
+  const validateRange01 = (value: number, fieldName: keyof CreditCardFormData): string | null => {
+    if (value < 0 || value > 1) {
+      return "Debe estar entre 0 y 1"
+    }
+    return null
+  }
+
   // ✅ Validación del formulario
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof CreditCardFormData, string>> = {}
@@ -97,28 +105,50 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
     if (formData.MINIMUM_PAYMENTS < 0) newErrors.MINIMUM_PAYMENTS = "Debe ser mayor o igual a 0"
     if (formData.CREDIT_LIMIT < 0) newErrors.CREDIT_LIMIT = "Debe ser mayor o igual a 0"
 
-    // Frecuencias / proporciones entre 0 y 1
-    if (formData.FRECUENCIA_SALDO < 0 || formData.FRECUENCIA_SALDO > 1) {
-      newErrors.FRECUENCIA_SALDO = "Debe estar entre 0 y 1"
-    }
-    if (formData.PURCHASES_FREQUENCY < 0 || formData.PURCHASES_FREQUENCY > 1) {
-      newErrors.PURCHASES_FREQUENCY = "Debe estar entre 0 y 1"
-    }
-    if (formData.FREC_COMPRAS_CONTADO < 0 || formData.FREC_COMPRAS_CONTADO > 1) {
-      newErrors.FREC_COMPRAS_CONTADO = "Debe estar entre 0 y 1"
-    }
-    if (formData.FREC_COMPRAS_CUOTAS < 0 || formData.FREC_COMPRAS_CUOTAS > 1) {
-      newErrors.FREC_COMPRAS_CUOTAS = "Debe estar entre 0 y 1"
-    }
-    if (formData.FREC_AVANCES < 0 || formData.FREC_AVANCES > 1) {
-      newErrors.FREC_AVANCES = "Debe estar entre 0 y 1"
-    }
-    if (formData.PRC_FULL_PAYMENT < 0 || formData.PRC_FULL_PAYMENT > 1) {
-      newErrors.PRC_FULL_PAYMENT = "Debe estar entre 0 y 1"
-    }
+    // Frecuencias / proporciones entre 0 y 1 usando función separada
+    const freqError = validateRange01(formData.FRECUENCIA_SALDO, "FRECUENCIA_SALDO")
+    if (freqError) newErrors.FRECUENCIA_SALDO = freqError
+
+    const purchasesFreqError = validateRange01(formData.PURCHASES_FREQUENCY, "PURCHASES_FREQUENCY")
+    if (purchasesFreqError) newErrors.PURCHASES_FREQUENCY = purchasesFreqError
+
+    const frecContadoError = validateRange01(formData.FREC_COMPRAS_CONTADO, "FREC_COMPRAS_CONTADO")
+    if (frecContadoError) newErrors.FREC_COMPRAS_CONTADO = frecContadoError
+
+    const frecCuotasError = validateRange01(formData.FREC_COMPRAS_CUOTAS, "FREC_COMPRAS_CUOTAS")
+    if (frecCuotasError) newErrors.FREC_COMPRAS_CUOTAS = frecCuotasError
+
+    const frecAvancesError = validateRange01(formData.FREC_AVANCES, "FREC_AVANCES")
+    if (frecAvancesError) newErrors.FREC_AVANCES = frecAvancesError
+
+    const prcFullError = validateRange01(formData.PRC_FULL_PAYMENT, "PRC_FULL_PAYMENT")
+    if (prcFullError) newErrors.PRC_FULL_PAYMENT = prcFullError
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
+  }
+
+  // ✅ Función para generar datos aleatorios
+  const fillRandomData = () => {
+    setErrors({})
+    setFormData({
+      BALANCE: Math.floor(Math.random() * 10000),
+      FRECUENCIA_SALDO: Math.random(),
+      COMPRAS_TOTALES: Math.floor(Math.random() * 50000),
+      COMPRAS_CONTADO: Math.floor(Math.random() * 20000),
+      COMPRAS_CUOTAS: Math.floor(Math.random() * 30000),
+      CASH_ADVANCE: Math.floor(Math.random() * 5000),
+      PURCHASES_FREQUENCY: Math.random(),
+      FREC_COMPRAS_CONTADO: Math.random(),
+      FREC_COMPRAS_CUOTAS: Math.random(),
+      FREC_AVANCES: Math.random(),
+      TRANSACCIONES_AVANCE: Math.floor(Math.random() * 50),
+      TRANSACCIONES_COMPRA: Math.floor(Math.random() * 200),
+      CREDIT_LIMIT: Math.floor(Math.random() * 50000) + 5000,
+      PAYMENTS: Math.floor(Math.random() * 20000),
+      MINIMUM_PAYMENTS: Math.floor(Math.random() * 5000),
+      PRC_FULL_PAYMENT: Math.random(),
+    })
   }
 
   // ✅ Mapeo de los nombres del form → nombres del backend
@@ -183,14 +213,27 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Datos del Cliente</CardTitle>
-          <CardDescription>
+      <Card className="border-2 border-primary/20 bg-card/50 backdrop-blur-sm shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10">
+          <CardTitle className="flex items-center gap-3 text-xl">
+            <span className="text-2xl">📝</span>
+            Datos del Cliente
+          </CardTitle>
+          <CardDescription className="text-base mt-2">
             Completa todos los campos para asignar el cluster y obtener la segmentación del cliente.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="flex justify-end mb-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={fillRandomData}
+              className="gap-2 mt-4"
+            >
+              Llenar con Datos Aleatorios
+            </Button>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Saldo */}
@@ -200,8 +243,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="BALANCE"
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={formData.BALANCE || ""}
+                  step="any"
+                  value={formData.BALANCE.toString()}
                   onChange={(e) =>
                     setFormData({ ...formData, BALANCE: Number(e.target.value) })
                   }
@@ -218,9 +261,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="FRECUENCIA_SALDO"
                   type="number"
                   min="0"
-                  max="1"
-                  step="0.01"
-                  value={formData.FRECUENCIA_SALDO || ""}
+                  step="any"
+                  value={formData.FRECUENCIA_SALDO.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -242,8 +284,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="COMPRAS_TOTALES"
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={formData.COMPRAS_TOTALES || ""}
+                  step="any"
+                  value={formData.COMPRAS_TOTALES.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -265,8 +307,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="COMPRAS_CONTADO"
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={formData.COMPRAS_CONTADO || ""}
+                  step="any"
+                  value={formData.COMPRAS_CONTADO.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -288,8 +330,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="COMPRAS_CUOTAS"
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={formData.COMPRAS_CUOTAS || ""}
+                  step="any"
+                  value={formData.COMPRAS_CUOTAS.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -311,8 +353,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="CASH_ADVANCE"
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={formData.CASH_ADVANCE || ""}
+                  step="any"
+                  value={formData.CASH_ADVANCE.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -336,9 +378,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="PURCHASES_FREQUENCY"
                   type="number"
                   min="0"
-                  max="1"
-                  step="0.01"
-                  value={formData.PURCHASES_FREQUENCY || ""}
+                  step="any"
+                  value={formData.PURCHASES_FREQUENCY.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -362,9 +403,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="FREC_COMPRAS_CONTADO"
                   type="number"
                   min="0"
-                  max="1"
-                  step="0.01"
-                  value={formData.FREC_COMPRAS_CONTADO || ""}
+                  step="any"
+                  value={formData.FREC_COMPRAS_CONTADO.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -388,9 +428,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="FREC_COMPRAS_CUOTAS"
                   type="number"
                   min="0"
-                  max="1"
-                  step="0.01"
-                  value={formData.FREC_COMPRAS_CUOTAS || ""}
+                  step="any"
+                  value={formData.FREC_COMPRAS_CUOTAS.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -414,9 +453,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="FREC_AVANCES"
                   type="number"
                   min="0"
-                  max="1"
-                  step="0.01"
-                  value={formData.FREC_AVANCES || ""}
+                  step="any"
+                  value={formData.FREC_AVANCES.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -440,8 +478,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="TRANSACCIONES_AVANCE"
                   type="number"
                   min="0"
-                  step="1"
-                  value={formData.TRANSACCIONES_AVANCE || ""}
+                  step="any"
+                  value={formData.TRANSACCIONES_AVANCE.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -465,8 +503,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="TRANSACCIONES_COMPRA"
                   type="number"
                   min="0"
-                  step="1"
-                  value={formData.TRANSACCIONES_COMPRA || ""}
+                  step="any"
+                  value={formData.TRANSACCIONES_COMPRA.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -488,8 +526,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="CREDIT_LIMIT"
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={formData.CREDIT_LIMIT || ""}
+                  step="any"
+                  value={formData.CREDIT_LIMIT.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -511,8 +549,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="PAYMENTS"
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={formData.PAYMENTS || ""}
+                  step="any"
+                  value={formData.PAYMENTS.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -534,8 +572,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="MINIMUM_PAYMENTS"
                   type="number"
                   min="0"
-                  step="0.01"
-                  value={formData.MINIMUM_PAYMENTS || ""}
+                  step="any"
+                  value={formData.MINIMUM_PAYMENTS.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -557,9 +595,8 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
                   id="PRC_FULL_PAYMENT"
                   type="number"
                   min="0"
-                  max="1"
-                  step="0.01"
-                  value={formData.PRC_FULL_PAYMENT || ""}
+                  step="any"
+                  value={formData.PRC_FULL_PAYMENT.toString()}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
@@ -581,42 +618,85 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
           </form>
 
           {apiError && (
-            <p className="mt-4 text-sm text-destructive">
-              {apiError}
-            </p>
+            <Card className="mt-4 border-2 border-destructive/50 bg-destructive/5 backdrop-blur-sm">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">❌</span>
+                  <div>
+                    <p className="text-destructive font-semibold text-lg">Error</p>
+                    <p className="text-destructive/80">{apiError}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </CardContent>
       </Card>
 
       {/* ✅ Resultado de la segmentación */}
       {result && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Resultado de Segmentación</CardTitle>
-            <CardDescription>
-              Modelo: {result.model.toUpperCase()} · Cluster asignado: {result.cluster}
-            </CardDescription>
+        <Card className="border-2 border-primary/50 bg-card/80 backdrop-blur-sm shadow-xl shadow-primary/20">
+          <CardHeader className="bg-gradient-to-r from-primary/20 to-primary/10 pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-3 text-2xl">
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <span className="text-3xl">🎯</span>
+                </div>
+                <span>Resultado de Segmentación</span>
+              </CardTitle>
+              <div className="flex gap-2">
+                <div className="px-4 py-2 rounded-full bg-primary/20 text-primary font-semibold">
+                  {result.model.toUpperCase()}
+                </div>
+                <div className="px-4 py-2 rounded-full bg-primary/30 text-primary font-bold text-lg">
+                  Cluster #{result.cluster}
+                </div>
+              </div>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="text-lg font-semibold">
-              {result.segmentacion.nombre_segmento}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {result.segmentacion.descripcion}
-            </p>
-            <div className="mt-4 space-y-1">
-              <p>
-                <span className="font-semibold">Riesgo:</span>{" "}
-                <span className="capitalize">{result.segmentacion.detalles.riesgo}</span>
+          <CardContent className="space-y-6 pt-8">
+            <div className="text-center space-y-3">
+              <h3 className="text-3xl font-bold text-primary">
+                {result.segmentacion.nombre_segmento}
+              </h3>
+              <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                {result.segmentacion.descripcion}
               </p>
-              <p>
-                <span className="font-semibold">Tipo de cliente:</span>{" "}
-                {result.segmentacion.detalles.tipo_cliente}
-              </p>
-              <p>
-                <span className="font-semibold">Recomendación:</span>{" "}
-                {result.segmentacion.detalles.recomendacion}
-              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-4 pt-4">
+              <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">
+                    {result.segmentacion.detalles.riesgo === "bajo" ? "🟢" : 
+                     result.segmentacion.detalles.riesgo === "medio" ? "🟡" : "🔴"}
+                  </span>
+                  <span className="text-sm font-semibold text-muted-foreground uppercase">Riesgo</span>
+                </div>
+                <p className="text-lg font-bold capitalize">
+                  {result.segmentacion.detalles.riesgo}
+                </p>
+              </div>
+              
+              <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">👤</span>
+                  <span className="text-sm font-semibold text-muted-foreground">Tipo de Cliente</span>
+                </div>
+                <p className="text-lg font-bold">
+                  {result.segmentacion.detalles.tipo_cliente}
+                </p>
+              </div>
+              
+              <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">💡</span>
+                  <span className="text-sm font-semibold text-muted-foreground">Recomendación</span>
+                </div>
+                <p className="text-sm font-medium leading-relaxed">
+                  {result.segmentacion.detalles.recomendacion}
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
