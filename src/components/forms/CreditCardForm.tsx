@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+const API_URL = import.meta.env.VITE_API_URL
+
 // ⬇️ Datos que captura el formulario
 export interface CreditCardFormData {
   BALANCE: number
@@ -46,7 +48,12 @@ interface KMeansResponse {
   segmentacion: SegmentacionCliente
 }
 
-export function CreditCardForm() {
+interface CreditCardFormProps {
+  onSubmit?: (data: CreditCardFormData) => Promise<void>
+  isLoading?: boolean
+}
+
+export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: CreditCardFormProps = {}) {
   const [formData, setFormData] = useState<CreditCardFormData>({
     BALANCE: 0,
     FRECUENCIA_SALDO: 0,
@@ -70,6 +77,9 @@ export function CreditCardForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<KMeansResponse | null>(null)
   const [apiError, setApiError] = useState<string | null>(null)
+
+  // Usar externalIsLoading si está disponible, sino usar el estado interno
+  const currentIsLoading = externalIsLoading !== undefined ? externalIsLoading : isLoading
 
   // ✅ Validación del formulario
   const validate = (): boolean => {
@@ -146,7 +156,7 @@ export function CreditCardForm() {
 
       const payload = buildPayload()
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/credit/kmeans`, {
+      const res = await fetch(`${API_URL}/credit/kmeans`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -160,6 +170,9 @@ export function CreditCardForm() {
 
       const data: KMeansResponse = await res.json()
       setResult(data)
+      if (onSubmit) {
+        await onSubmit(formData)
+      }
     } catch (err: any) {
       console.error(err)
       setApiError(err.message ?? "Ocurrió un error inesperado")
@@ -562,8 +575,8 @@ export function CreditCardForm() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Procesando..." : "Asignar Cluster"}
+            <Button type="submit" className="w-full" disabled={currentIsLoading}>
+              {currentIsLoading ? "Procesando..." : "Asignar Cluster"}
             </Button>
           </form>
 
