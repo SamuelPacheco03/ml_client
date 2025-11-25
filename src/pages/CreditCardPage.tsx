@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CreditCardForm } from "@/components/forms/CreditCardForm"
 import type { CreditCardFormData } from "@/components/forms/CreditCardForm"
 
+const API_URL = import.meta.env.VITE_API_URL
+
 export function CreditCardPage() {
   const [result, setResult] = useState<{ cluster: number; descripcion: string } | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -16,7 +18,7 @@ export function CreditCardPage() {
     setSubmittedData(data)
 
     try {
-      const response = await fetch("/api/credit/kmeans", {
+      const response = await fetch(`${API_URL}/credit/kmeans`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

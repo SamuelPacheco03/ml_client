@@ -19,6 +19,8 @@ export interface ChurnFormData {
   dependientes: string
   tipo_internet: string
   seguridad_en_linea: string
+  respaldo_en_linea: string
+  proteccion_dispositivo: string
   soporte_tecnico: string
   tipo_contrato: string
   facturacion_electronica: string
@@ -39,6 +41,8 @@ export function ChurnForm({ onSubmit, isLoading }: ChurnFormProps) {
     dependientes: "",
     tipo_internet: "",
     seguridad_en_linea: "",
+    respaldo_en_linea: "",
+    proteccion_dispositivo: "",
     soporte_tecnico: "",
     tipo_contrato: "",
     facturacion_electronica: "",
@@ -70,6 +74,12 @@ export function ChurnForm({ onSubmit, isLoading }: ChurnFormProps) {
     }
     if (!formData.seguridad_en_linea) {
       newErrors.seguridad_en_linea = "Campo requerido"
+    }
+    if (!formData.respaldo_en_linea) {
+      newErrors.respaldo_en_linea = "Campo requerido"
+    }
+    if (!formData.proteccion_dispositivo) {
+      newErrors.proteccion_dispositivo = "Campo requerido"
     }
     if (!formData.soporte_tecnico) {
       newErrors.soporte_tecnico = "Campo requerido"
@@ -243,6 +253,50 @@ export function ChurnForm({ onSubmit, isLoading }: ChurnFormProps) {
               </Select>
               {errors.seguridad_en_linea && (
                 <p className="text-sm text-destructive">{errors.seguridad_en_linea}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="respaldo_en_linea">Respaldo en Línea</Label>
+              <Select
+                value={formData.respaldo_en_linea}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, respaldo_en_linea: value })
+                }
+              >
+                <SelectTrigger id="respaldo_en_linea">
+                  <SelectValue placeholder="Selecciona" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="No">No</SelectItem>
+                  <SelectItem value="Yes">Sí</SelectItem>
+                  <SelectItem value="No internet service">No internet service</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.respaldo_en_linea && (
+                <p className="text-sm text-destructive">{errors.respaldo_en_linea}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="proteccion_dispositivo">Protección de Dispositivo</Label>
+              <Select
+                value={formData.proteccion_dispositivo}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, proteccion_dispositivo: value })
+                }
+              >
+                <SelectTrigger id="proteccion_dispositivo">
+                  <SelectValue placeholder="Selecciona" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="No">No</SelectItem>
+                  <SelectItem value="Yes">Sí</SelectItem>
+                  <SelectItem value="No internet service">No internet service</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.proteccion_dispositivo && (
+                <p className="text-sm text-destructive">{errors.proteccion_dispositivo}</p>
               )}
             </div>
 

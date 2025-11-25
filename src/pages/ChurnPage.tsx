@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label"
 import { ChurnForm } from "@/components/forms/ChurnForm"
 import type { ChurnFormData } from "@/components/forms/ChurnForm"
 
+const API_URL = import.meta.env.VITE_API_URL
+
 type ModelType = "knn" | "logreg"
 
 export function ChurnPage() {
@@ -20,10 +22,10 @@ export function ChurnPage() {
 
     try {
       const endpoint = selectedModel === "knn" 
-        ? "/api/churn/knn" 
-        : "/api/churn/logreg"
+        ? "/churn/knn" 
+        : "/churn/logreg"
 
-      const response = await fetch(endpoint, {
+      const response = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
