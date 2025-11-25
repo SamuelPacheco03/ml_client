@@ -82,7 +82,7 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
   const currentIsLoading = externalIsLoading !== undefined ? externalIsLoading : isLoading
 
   // ✅ Función para validar campos entre 0 y 1
-  const validateRange01 = (value: number, fieldName: keyof CreditCardFormData): string | null => {
+  const validateRange01 = (value: number): string | null => {
     if (value < 0 || value > 1) {
       return "Debe estar entre 0 y 1"
     }
@@ -106,48 +106,64 @@ export function CreditCardForm({ onSubmit, isLoading: externalIsLoading }: Credi
     if (formData.CREDIT_LIMIT < 0) newErrors.CREDIT_LIMIT = "Debe ser mayor o igual a 0"
 
     // Frecuencias / proporciones entre 0 y 1 usando función separada
-    const freqError = validateRange01(formData.FRECUENCIA_SALDO, "FRECUENCIA_SALDO")
+    const freqError = validateRange01(formData.FRECUENCIA_SALDO)
     if (freqError) newErrors.FRECUENCIA_SALDO = freqError
 
-    const purchasesFreqError = validateRange01(formData.PURCHASES_FREQUENCY, "PURCHASES_FREQUENCY")
+    const purchasesFreqError = validateRange01(formData.PURCHASES_FREQUENCY)
     if (purchasesFreqError) newErrors.PURCHASES_FREQUENCY = purchasesFreqError
 
-    const frecContadoError = validateRange01(formData.FREC_COMPRAS_CONTADO, "FREC_COMPRAS_CONTADO")
+    const frecContadoError = validateRange01(formData.FREC_COMPRAS_CONTADO)
     if (frecContadoError) newErrors.FREC_COMPRAS_CONTADO = frecContadoError
 
-    const frecCuotasError = validateRange01(formData.FREC_COMPRAS_CUOTAS, "FREC_COMPRAS_CUOTAS")
+    const frecCuotasError = validateRange01(formData.FREC_COMPRAS_CUOTAS)
     if (frecCuotasError) newErrors.FREC_COMPRAS_CUOTAS = frecCuotasError
 
-    const frecAvancesError = validateRange01(formData.FREC_AVANCES, "FREC_AVANCES")
+    const frecAvancesError = validateRange01(formData.FREC_AVANCES)
     if (frecAvancesError) newErrors.FREC_AVANCES = frecAvancesError
 
-    const prcFullError = validateRange01(formData.PRC_FULL_PAYMENT, "PRC_FULL_PAYMENT")
+    const prcFullError = validateRange01(formData.PRC_FULL_PAYMENT)
     if (prcFullError) newErrors.PRC_FULL_PAYMENT = prcFullError
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  // ✅ Función para generar datos aleatorios
+  // ✅ Función para generar datos aleatorios basados en los rangos del heatmap
   const fillRandomData = () => {
     setErrors({})
     setFormData({
-      BALANCE: Math.floor(Math.random() * 10000),
+      // Saldo: rango 0-5000 (según heatmap: 660-4754)
+      BALANCE: Math.floor(Math.random() * 5000),
+      // Frecuencia_Saldo: 0-1
       FRECUENCIA_SALDO: Math.random(),
-      COMPRAS_TOTALES: Math.floor(Math.random() * 50000),
-      COMPRAS_CONTADO: Math.floor(Math.random() * 20000),
-      COMPRAS_CUOTAS: Math.floor(Math.random() * 30000),
+      // Compras_Totales: rango 0-15000 (según heatmap: 275-14214)
+      COMPRAS_TOTALES: Math.floor(Math.random() * 15000),
+      // Compras_Contado: rango 0-10000 (según heatmap: 222-9364)
+      COMPRAS_CONTADO: Math.floor(Math.random() * 10000),
+      // Compras_Cuotas: rango 0-5000 (según heatmap: 53-4850)
+      COMPRAS_CUOTAS: Math.floor(Math.random() * 5000),
+      // Avances_Efectivo: rango 0-5000 (según heatmap: 184-4626)
       CASH_ADVANCE: Math.floor(Math.random() * 5000),
+      // Frecuencia_Compras: 0-1
       PURCHASES_FREQUENCY: Math.random(),
+      // Frec_Compras_Contado: 0-1
       FREC_COMPRAS_CONTADO: Math.random(),
+      // Frec_Compras_Cuotas: 0-1
       FREC_COMPRAS_CUOTAS: Math.random(),
-      FREC_AVANCES: Math.random(),
-      TRANSACCIONES_AVANCE: Math.floor(Math.random() * 50),
-      TRANSACCIONES_COMPRA: Math.floor(Math.random() * 200),
-      CREDIT_LIMIT: Math.floor(Math.random() * 50000) + 5000,
-      PAYMENTS: Math.floor(Math.random() * 20000),
-      MINIMUM_PAYMENTS: Math.floor(Math.random() * 5000),
-      PRC_FULL_PAYMENT: Math.random(),
+      // Frec_Avances: rango 0-0.6 (según heatmap: 0.0-0.5)
+      FREC_AVANCES: Math.random() * 0.6,
+      // Transacciones_Avance: rango 0-20 (según heatmap: 2-15)
+      TRANSACCIONES_AVANCE: Math.floor(Math.random() * 20),
+      // Transacciones_Compra: rango 0-150 (según heatmap: 3-128)
+      TRANSACCIONES_COMPRA: Math.floor(Math.random() * 150),
+      // Limite_Credito: rango 3000-15000 (según heatmap: 3221-12102)
+      CREDIT_LIMIT: Math.floor(Math.random() * 12000) + 3000,
+      // Pagos_Realizados: rango 0-15000 (según heatmap: 941-14325)
+      PAYMENTS: Math.floor(Math.random() * 15000),
+      // Pago_Minimo: rango 0-4000 (según heatmap: 558-3375)
+      MINIMUM_PAYMENTS: Math.floor(Math.random() * 4000),
+      // Pct_Pago_Completo: rango 0-0.5 (según heatmap: 0.0-0.3)
+      PRC_FULL_PAYMENT: Math.random() * 0.5,
     })
   }
 
