@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CreditCardForm } from "@/components/forms/CreditCardForm"
 import type { CreditCardFormData } from "@/components/forms/CreditCardForm"
 
