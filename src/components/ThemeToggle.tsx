@@ -4,7 +4,7 @@ import { useTheme } from "@/hooks/useTheme"
 
 export function ThemeToggle() {
   const { theme, toggleTheme } = useTheme()
-
+  console.log(theme)
   return (
     <Button
       variant="ghost"
