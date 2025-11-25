@@ -1,8 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { CreditCardForm } from "@/components/forms/CreditCardForm"
-import type { CreditCardFormData } from "@/components/forms/CreditCardForm"
-
-const API_URL = import.meta.env.VITE_API_URL
 
 export function CreditCardPage() {
   return (
